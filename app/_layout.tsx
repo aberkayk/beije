@@ -10,6 +10,7 @@ import "react-native-reanimated";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import AuthProvider from "@/redux/providers/auth-provider";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -53,12 +54,14 @@ function RootLayoutNav() {
           value={colorScheme === "dark" ? DefaultTheme : DefaultTheme}
         >
           <AuthProvider>
-            <Stack>
-              <Stack.Screen
-                name="(tabs)"
-                options={{ headerShown: false }}
-              />
-            </Stack>
+            <GestureHandlerRootView>
+              <Stack>
+                <Stack.Screen
+                  name="(tabs)"
+                  options={{ headerShown: false }}
+                />
+              </Stack>
+            </GestureHandlerRootView>
           </AuthProvider>
         </ThemeProvider>
       </PersistGate>

@@ -61,6 +61,8 @@ export default function TabLayout() {
           backgroundColor: background,
           height: 88,
           paddingTop: 12,
+          borderWidth: 0,
+          borderTopWidth: 0,
         },
       }}
     >

@@ -4,6 +4,7 @@ import barchart from "../assets/icons/barchart.png";
 import eye from "../assets/icons/eye.png";
 import bell from "../assets/icons/bell.png";
 import cardIcon from "../assets/icons/card-icon.png";
+import card from "../assets/icons/card.png";
 
 export default {
   barchart,
@@ -12,4 +13,5 @@ export default {
   innercircle,
   bell,
   cardIcon,
+  card,
 };
