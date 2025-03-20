@@ -1,19 +1,53 @@
 import React from "react";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
-import { Pressable, useColorScheme } from "react-native";
-import Colors from "@/constants/colors";
+import {
+  Pressable,
+  useColorScheme,
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  StyleProp,
+  TextStyle,
+} from "react-native";
+import Colors from "@/constants/Colors";
+import Icons from "@/constants/Icons";
+import { useThemeColor } from "@/hooks/use-theme-color";
 
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>["name"];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-}
+const TabIcon = ({
+  focused,
+  icon,
+  title,
+  textStyle,
+}: {
+  focused: boolean;
+  icon: any;
+  title: string;
+  textStyle?: StyleProp<TextStyle>;
+}) => (
+  <View style={styles.tabIconContainer}>
+    <Image
+      style={{}}
+      source={icon}
+      tintColor={focused ? Colors.dark.tint : Colors.dark.tabIconDefault}
+      resizeMode="contain"
+    />
+    <Text
+      style={[
+        {
+          color: focused ? Colors.dark.text : Colors.dark.textSecondary,
+        },
+        textStyle,
+      ]}
+    >
+      {title}
+    </Text>
+  </View>
+);
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const background = useThemeColor({}, "background");
 
   return (
     <Tabs
@@ -22,40 +56,94 @@ export default function TabLayout() {
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
         headerShown: false,
+        tabBarShowLabel: false,
+        tabBarStyle: {
+          backgroundColor: background,
+          height: 88,
+          paddingTop: 12,
+        },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: "Tab One",
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="code" color={color} />
-          ),
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? "light"].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
+          title: "Döngü",
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              textStyle={styles.tabLabel}
+              icon={Icons.innercircle}
+              focused={focused}
+              title="Döngü"
+            />
           ),
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="calendar"
         options={{
-          title: "Tab Two",
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="code" color={color} />
+          title: "Takvim",
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              textStyle={styles.tabLabel}
+              icon={Icons.calendar}
+              focused={focused}
+              title="Takvim"
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="analyze"
+        options={{
+          title: "Analiz",
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              textStyle={styles.tabLabel}
+              icon={Icons.barchart}
+              focused={focused}
+              title="Analiz"
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="guide"
+        options={{
+          title: "Rehber",
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
+              textStyle={styles.tabLabel}
+              icon={Icons.eye}
+              focused={focused}
+              title="Rehber"
+            />
           ),
         }}
       />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  tabIconContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    height: 16,
+  },
+  iconImage: {
+    width: 24,
+    height: 24,
+    marginBottom: 4,
+  },
+  tabLabel: {
+    fontSize: 9,
+    fontWeight: 500,
+    textAlign: "center",
+    minWidth: 80,
+    marginTop: 4,
+  },
+});

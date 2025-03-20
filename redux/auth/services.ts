@@ -1,4 +1,3 @@
-import { Tags } from "@/constants/enums";
 import { api } from "../api";
 
 export const authServices = api.injectEndpoints({
@@ -9,17 +8,12 @@ export const authServices = api.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: [Tags.User],
     }),
     getProfile: builder.query({
       query: () => ({
         url: "/profile",
         method: "GET",
-        headers: {
-          "x-auth-token": localStorage.getItem("token") || "",
-        },
       }),
-      providesTags: [Tags.User],
     }),
   }),
   overrideExisting: true,

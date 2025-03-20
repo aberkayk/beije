@@ -1,13 +1,13 @@
+import { AuthUser } from "@/types/auth";
+import { ProfileData } from "@/types/profile";
 import { createSlice } from "@reduxjs/toolkit";
 import { login, getProfile, authServices } from "./services";
 import { RootState } from "../store";
-import { AuthUser } from "@/types/auth";
-import { Profile } from "@/types/profile";
 
 interface AuthState {
   user: AuthUser | null;
   token: string;
-  profile: Profile | null;
+  profile: ProfileData | null;
 }
 
 const initialState: AuthState = {
@@ -23,11 +23,14 @@ const authSlice = createSlice({
     setToken: (state, action) => {
       state.token = action.payload;
     },
+    setProfile: (state, action) => {
+      state.profile = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
       .addMatcher(login.matchFulfilled, (state, action) => {
-        state.token = action.payload.data.token;
+        state.token = action.payload.token;
       })
       .addMatcher(getProfile.matchFulfilled, (state, action) => {
         state.profile = action.payload.data;
@@ -38,5 +41,5 @@ const authSlice = createSlice({
 export const selectIsAuth = (state: RootState) => !!state.auth.token;
 export const selectProfile = (state: RootState) => state.auth.profile;
 
-export const { setToken } = authSlice.actions;
+export const { setToken, setProfile } = authSlice.actions;
 export default authSlice.reducer;

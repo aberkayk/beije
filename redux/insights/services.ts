@@ -1,4 +1,4 @@
-import { Tags } from "@/constants/enums";
+import { Tags } from "@/constants/Enums";
 import { api } from "../api";
 import { InsightsResponse } from "@/types/insights";
 
@@ -8,11 +8,7 @@ export const insightsServices = api.injectEndpoints({
       query: () => ({
         url: "/insights",
         method: "GET",
-        headers: {
-          "x-auth-token": localStorage.getItem("token") || "",
-        },
       }),
-      providesTags: [Tags.Insights],
     }),
   }),
   overrideExisting: true,

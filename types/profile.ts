@@ -7,11 +7,20 @@ export interface ProfileInfo {
 }
 
 export interface CycleStatus {
-  isRegistruationComplete: boolean;
+  isRegistrationComplete: boolean;
   inOnboardingCompleted: boolean;
 }
 
-export interface Profile {
+export interface ProfileResponse {
+  success: boolean;
+  data: {
+    _id: string;
+    profileInfo: ProfileInfo;
+    cycleStatus: CycleStatus;
+  };
+}
+
+export interface ProfileData {
   _id: string;
   profileInfo: ProfileInfo;
   cycleStatus: CycleStatus;

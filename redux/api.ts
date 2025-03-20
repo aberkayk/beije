@@ -1,22 +1,12 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { RootState } from "./store";
-import { Tags } from "@/constants/enums";
+import { Tags } from "@/constants/Enums";
 
 // Create our baseQuery instance
 export const baseQuery = fetchBaseQuery({
   baseUrl: "https://96318a87-0588-4da5-9843-b3d7919f1782.mock.pstmn.io",
   prepareHeaders: (headers, { getState }) => {
-    headers.set("Content-Type", "application/json");
-
     // Get the token from the auth state
-    const { token } = (getState() as RootState).auth;
-
-    // If we have a token set, use it for auth
-    if (token) {
-      headers.set("Authorization", `Bearer ${token}`);
-    }
-
-    return headers;
   },
 });
 

@@ -1,4 +1,3 @@
-import { Tags } from "@/constants/enums";
 import { api } from "../api";
 import { MenstruationDaysResponse } from "@/types/menstruation";
 
@@ -8,9 +7,6 @@ export const menstruationDaysServices = api.injectEndpoints({
       query: () => ({
         url: "/menstruation-days",
         method: "GET",
-        headers: {
-          "x-auth-token": localStorage.getItem("token") || "",
-        },
       }),
     }),
   }),

@@ -1,11 +1,29 @@
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { StyleSheet } from "react-native";
+import { useSelector } from "react-redux";
+import { selectProfile } from "@/redux/auth/slice";
+import { useGetProfileQuery } from "@/redux/auth/services";
 
-export default function TabOneScreen() {
+export default function CycleScreen() {
+  const profile = useSelector(selectProfile);
+  const { data: profileData, isLoading } = useGetProfileQuery({});
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
+      <Text style={styles.title}>Profil Bilgileri</Text>
+      {isLoading ? (
+        <Text>Yükleniyor...</Text>
+      ) : profile?.profileInfo ? (
+        <View style={styles.profileInfo}>
+          <Text>Ad: {profile.profileInfo.firstName}</Text>
+          <Text>Soyad: {profile.profileInfo.lastName}</Text>
+          <Text>E-posta: {profile.profileInfo.email}</Text>
+          <Text>Doğum Tarihi: {profile.profileInfo.birthDate}</Text>
+        </View>
+      ) : (
+        <Text>Profil bilgileri bulunamadı</Text>
+      )}
       <View
         style={styles.separator}
         lightColor="#eee"
@@ -20,10 +38,16 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    padding: 20,
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "bold",
+    marginBottom: 20,
+  },
+  profileInfo: {
+    width: "100%",
+    gap: 10,
   },
   separator: {
     marginVertical: 30,
