@@ -3,6 +3,7 @@ import {
   View as RNView,
   Pressable,
   FlatList,
+  Animated,
 } from "react-native";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
@@ -10,7 +11,7 @@ import { useSelector } from "react-redux";
 import { selectProfile } from "@/redux/auth/slice";
 import { useGetMenstruationDaysQuery } from "@/redux/menstruation-days/services";
 import { useGetInsightsQuery } from "@/redux/insights/services";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import Colors from "@/constants/Colors";
 import Icons from "@/constants/Icons";
 import { Image } from "react-native";
@@ -24,6 +25,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function CycleScreen() {
   const profile = useSelector(selectProfile);
   const [sheetIndex, setSheetIndex] = useState(0);
+  const noteCardAnimation = useRef(new Animated.Value(0)).current;
   const {
     data: menstruationData,
     isLoading: isLoadingMenstruation,
@@ -31,6 +33,22 @@ export default function CycleScreen() {
   } = useGetMenstruationDaysQuery();
   const { data: insightsData } = useGetInsightsQuery();
   const bottomSheetRef = useRef<BottomSheet>(null);
+
+  useEffect(() => {
+    if (sheetIndex === 1) {
+      Animated.timing(noteCardAnimation, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(noteCardAnimation, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [sheetIndex]);
 
   const cycleData = useMemo(() => {
     if (
@@ -84,7 +102,13 @@ export default function CycleScreen() {
             data={insightsData?.data.insights}
             keyExtractor={(item) => item._id}
             renderItem={({ item, index }) => (
-              <InsightCard insight={item} isFirstItem={index === 0} />
+              <InsightCard
+                insight={item}
+                isFirstItem={index === 0}
+                isLastItem={
+                  index === (insightsData?.data?.insights?.length ?? 0) - 1
+                }
+              />
             )}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.flatListContent}
@@ -96,7 +120,27 @@ export default function CycleScreen() {
                 }}
               />
             )}
-            ListHeaderComponent={sheetIndex === 1 ? <NoteCard /> : <></>}
+            ListHeaderComponent={
+              sheetIndex === 1 ? (
+                <Animated.View
+                  style={{
+                    opacity: noteCardAnimation,
+                    transform: [
+                      {
+                        translateY: noteCardAnimation.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [20, 0],
+                        }),
+                      },
+                    ],
+                  }}
+                >
+                  <NoteCard />
+                </Animated.View>
+              ) : (
+                <></>
+              )
+            }
           />
         </BottomSheetView>
       </BottomSheet>
@@ -185,7 +229,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   flatListContent: {
-    paddingBottom: 320,
+    paddingBottom: 20,
   },
   expandedContent: {
     marginTop: 24,

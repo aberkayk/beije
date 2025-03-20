@@ -9,14 +9,22 @@ import { Insight } from "@/types/insights";
 interface InsightCardProps {
   insight: Insight;
   isFirstItem?: boolean;
+  isLastItem?: boolean;
 }
 
 export const InsightCard: React.FC<InsightCardProps> = ({
   insight,
   isFirstItem,
+  isLastItem,
 }) => {
   return (
-    <View style={[styles.container, isFirstItem && styles.firstItem]}>
+    <View
+      style={[
+        styles.container,
+        isFirstItem && styles.firstItem,
+        isLastItem && styles.lastItem,
+      ]}
+    >
       <View style={styles.header}>
         <View style={styles.iconContainer}>
           <Image source={Icons.card} style={styles.icon} />
@@ -45,6 +53,10 @@ const styles = StyleSheet.create({
   firstItem: {
     borderTopEndRadius: 12,
     borderTopStartRadius: 12,
+  },
+  lastItem: {
+    borderBottomEndRadius: 12,
+    borderBottomStartRadius: 12,
   },
   header: {
     flexDirection: "row",
