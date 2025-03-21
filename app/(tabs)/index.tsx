@@ -28,14 +28,30 @@ export default function HomeScreen() {
     if (!menstruationData?.data.menstrationDays) return null;
 
     const days = menstruationData.data.menstrationDays;
-    const currentDate = new Date();
-    const currentDay = currentDate.getDate();
     const cycleLength = menstruationData.data.cycleInfo.totalDays || 28;
+
+    // Günleri tarihe göre sırala
+    const sortedDays = [...days].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+
+    // Döngünün başlangıç gününü bul (en eski tarih)
+    const cycleStartDate = new Date(sortedDays[0].date);
+    cycleStartDate.setHours(0, 0, 0, 0);
+
+    // Bugünün kaçıncı gün olduğunu hesapla
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const daysSinceStart = Math.floor(
+      (today.getTime() - cycleStartDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    const currentDay =
+      ((daysSinceStart % cycleLength) + cycleLength) % cycleLength;
 
     return {
       totalDays: cycleLength,
-      currentDay: currentDay,
-      days: days,
+      currentDay: currentDay + 1, // 1-based index
+      days: sortedDays,
     } as CycleData;
   }, [menstruationData]);
 

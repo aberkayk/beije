@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet } from "react-native";
-import Svg, { Circle, Path } from "react-native-svg";
+import Svg, { Circle, Path, Text as SvgText } from "react-native-svg";
 import { View } from "./ui/view";
 import { Text } from "./ui/text";
 import Colors from "@/constants/Colors";
@@ -10,6 +10,11 @@ const CIRCLE_RADIUS = 120;
 const DOT_RADIUS = 6;
 const STROKE_WIDTH = 20; // Yayın kalınlığı
 
+// Nokta boyutları
+const NORMAL_DOT_RADIUS = 2;
+const SPECIAL_DOT_RADIUS = 6;
+const CURRENT_DAY_RADIUS = 12;
+
 interface CycleScreenProps {
   cycleData: CycleData;
 }
@@ -17,14 +22,41 @@ interface CycleScreenProps {
 const getArcPath = (radius: number, strokeWidth: number) => {
   const r = radius - strokeWidth / 2;
   return `
-    M ${-r} 0 
-    A ${r} ${r} 0 1 1 ${r} 0 
-    A ${r} ${r} 0 1 1 ${-r} 0
+  M ${-r} 0 
+  A ${r} ${r} 0 1 1 ${r} 0 
+  A ${r} ${r} 0 1 1 ${-r} 0
   `;
 };
 
 const CycleScreen: React.FC<CycleScreenProps> = ({ cycleData }) => {
   const dots = [];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Döngünün başlangıç gününü bul (en eski tarih)
+  const cycleStartDate = new Date(cycleData.days[0].date);
+  cycleStartDate.setHours(0, 0, 0, 0);
+
+  // Gösterilecek tarihi hesapla (başlangıç tarihi + current day)
+  const displayDate = new Date(cycleStartDate);
+  displayDate.setDate(displayDate.getDate() + (cycleData.currentDay - 1)); // currentDay 1-based index
+
+  console.log("CycleScreen Debug:");
+  console.log("Today:", today.toISOString());
+  console.log("Display Date:", displayDate.toISOString());
+  console.log("Cycle Data:", {
+    totalDays: cycleData.totalDays,
+    currentDay: cycleData.currentDay,
+    daysCount: cycleData.days.length,
+    days: cycleData.days.map((d) => ({
+      date: d.date,
+      type: d.type,
+    })),
+  });
+
+  // Bugünün konumunu saklamak için değişkenler
+  let currentDayX = 0;
+  let currentDayY = 0;
 
   for (let i = 0; i < cycleData.totalDays; i++) {
     const angle = (i / cycleData.totalDays) * 2 * Math.PI - Math.PI / 2;
@@ -32,9 +64,24 @@ const CycleScreen: React.FC<CycleScreenProps> = ({ cycleData }) => {
     const y = CIRCLE_RADIUS * Math.sin(angle);
 
     let color = "#e2e2e2"; // Normal gün
-    const day = cycleData.days.find(
-      (d) => new Date(d.date).getDate() === i + 1
-    );
+    let isCurrentDay = i === cycleData.currentDay - 1; // currentDay 1-based index
+
+    // Bugünün konumunu sakla
+    if (isCurrentDay) {
+      currentDayX = x;
+      currentDayY = y;
+    }
+
+    // Bu pozisyona denk gelen günü bul
+    const targetDate = new Date(cycleStartDate);
+    targetDate.setDate(targetDate.getDate() + i);
+    targetDate.setHours(0, 0, 0, 0);
+
+    const day = cycleData.days.find((d) => {
+      const dayDate = new Date(d.date);
+      dayDate.setHours(0, 0, 0, 0);
+      return dayDate.getTime() === targetDate.getTime();
+    });
 
     if (day) {
       switch (day.type) {
@@ -52,11 +99,20 @@ const CycleScreen: React.FC<CycleScreenProps> = ({ cycleData }) => {
       }
     }
 
-    if (i + 1 === cycleData.currentDay) {
-      color = "#117A65"; // Güncel gün (koyu yeşil)
+    // Bugünün rengini ayarla
+    if (isCurrentDay) {
+      color = "#000000"; // Bugün için siyah renk
     }
 
-    const radius = color === "#e2e2e2" ? 2 : 6; // Normal günler için yarı boyut
+    // Noktanın yarıçapını belirle
+    let radius;
+    if (isCurrentDay) {
+      radius = CURRENT_DAY_RADIUS; // Bugün için 12px
+    } else if (color === "#e2e2e2") {
+      radius = NORMAL_DOT_RADIUS; // Normal günler için 2px
+    } else {
+      radius = SPECIAL_DOT_RADIUS; // Özel günler için 6px
+    }
 
     dots.push(<Circle key={i} cx={x} cy={y} r={radius} fill={color} />);
   }
@@ -64,7 +120,7 @@ const CycleScreen: React.FC<CycleScreenProps> = ({ cycleData }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.date}>
-        {new Date().toLocaleDateString("tr-TR", {
+        {displayDate.toLocaleDateString("tr-TR", {
           day: "2-digit",
           month: "long",
         })}
@@ -88,6 +144,18 @@ const CycleScreen: React.FC<CycleScreenProps> = ({ cycleData }) => {
 
         {/* Noktalar */}
         {dots}
+
+        {/* Bugün yazısı */}
+        <SvgText
+          x={currentDayX}
+          y={currentDayY}
+          fontSize="7"
+          fill="white"
+          textAnchor="middle"
+          alignmentBaseline="middle"
+        >
+          Bugün
+        </SvgText>
       </Svg>
     </View>
   );
