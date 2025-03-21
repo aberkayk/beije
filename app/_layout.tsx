@@ -57,7 +57,7 @@ function RootLayoutNav() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 6000);
+    }, 0);
     return () => clearTimeout(timer);
   }, []);
 

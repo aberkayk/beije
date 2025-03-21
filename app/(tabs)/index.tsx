@@ -1,68 +1,42 @@
-import {
-  StyleSheet,
-  View as RNView,
-  Pressable,
-  FlatList,
-  Animated,
-} from "react-native";
+import { StyleSheet, Pressable, Image } from "react-native";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { useSelector } from "react-redux";
 import { selectProfile } from "@/redux/auth/slice";
 import { useGetMenstruationDaysQuery } from "@/redux/menstruation-days/services";
 import { useGetInsightsQuery } from "@/redux/insights/services";
-import { useMemo, useRef, useState, useEffect } from "react";
+import { useMemo } from "react";
 import Colors from "@/constants/Colors";
 import Icons from "@/constants/Icons";
-import { Image } from "react-native";
-import { CycleArc } from "@/components/cycle-arc";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import { InsightCard } from "@/components/insight-card";
-import { NoteCard } from "@/components/note-card";
 import React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import TodaysFeatured from "@/components/todays-featured";
+import { CycleData } from "@/types/menstruation";
+import CycleScreen from "@/components/cycle-screen";
 
-export default function CycleScreen() {
+export default function HomeScreen() {
   const profile = useSelector(selectProfile);
-  const [sheetIndex, setSheetIndex] = useState(0);
-  const noteCardAnimation = useRef(new Animated.Value(0)).current;
+
   const {
     data: menstruationData,
     isLoading: isLoadingMenstruation,
     error: menstruationError,
   } = useGetMenstruationDaysQuery();
-  const { data: insightsData } = useGetInsightsQuery();
-  const bottomSheetRef = useRef<BottomSheet>(null);
 
-  useEffect(() => {
-    if (sheetIndex === 1) {
-      Animated.timing(noteCardAnimation, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    } else {
-      Animated.timing(noteCardAnimation, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [sheetIndex]);
+  const { data: insightsData } = useGetInsightsQuery();
 
   const cycleData = useMemo(() => {
-    if (
-      !menstruationData?.data?.menstrationDays ||
-      !menstruationData?.data?.cycleInfo
-    )
-      return null;
+    if (!menstruationData?.data.menstrationDays) return null;
 
-    const { menstrationDays: days, cycleInfo } = menstruationData.data;
+    const days = menstruationData.data.menstrationDays;
+    const currentDate = new Date();
+    const currentDay = currentDate.getDate();
+    const cycleLength = menstruationData.data.cycleInfo.totalDays || 28;
+
     return {
-      totalDays: cycleInfo.totalDays,
-      currentDay: cycleInfo.currentDay,
-      days,
-    };
+      totalDays: cycleLength,
+      currentDay: currentDay,
+      days: days,
+    } as CycleData;
   }, [menstruationData]);
 
   return (
@@ -78,72 +52,9 @@ export default function CycleScreen() {
         </Pressable>
       </View>
 
-      <Text style={styles.date}>13 Ekim</Text>
-      {cycleData && <CycleArc cycleData={cycleData} />}
+      {cycleData && <CycleScreen cycleData={cycleData} />}
 
-      <BottomSheet
-        index={0}
-        snapPoints={["25%", 500]}
-        backgroundStyle={{ backgroundColor: Colors.light.background }}
-        handleIndicatorStyle={styles.bottomSheetIndicator}
-        ref={bottomSheetRef}
-        onChange={setSheetIndex}
-        maxDynamicContentSize={500}
-      >
-        <BottomSheetView
-          style={[
-            styles.insightsContainer,
-            { backgroundColor: Colors.light.background },
-          ]}
-        >
-          <Text style={styles.insightsTitle}>Bugün Öne Çıkanlar</Text>
-
-          <FlatList
-            data={insightsData?.data.insights}
-            keyExtractor={(item) => item._id}
-            renderItem={({ item, index }) => (
-              <InsightCard
-                insight={item}
-                isFirstItem={index === 0}
-                isLastItem={
-                  index === (insightsData?.data?.insights?.length ?? 0) - 1
-                }
-              />
-            )}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.flatListContent}
-            ItemSeparatorComponent={() => (
-              <View
-                style={{
-                  height: 1,
-                  backgroundColor: Colors.light.background,
-                }}
-              />
-            )}
-            ListHeaderComponent={
-              sheetIndex === 1 ? (
-                <Animated.View
-                  style={{
-                    opacity: noteCardAnimation,
-                    transform: [
-                      {
-                        translateY: noteCardAnimation.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [20, 0],
-                        }),
-                      },
-                    ],
-                  }}
-                >
-                  <NoteCard />
-                </Animated.View>
-              ) : (
-                <></>
-              )
-            }
-          />
-        </BottomSheetView>
-      </BottomSheet>
+      <TodaysFeatured insights={insightsData?.data.insights ?? []} />
     </View>
   );
 }
@@ -151,6 +62,7 @@ export default function CycleScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    position: "relative",
     backgroundColor: Colors.light.backgroundTertiary,
   },
   header: {
@@ -187,13 +99,7 @@ const styles = StyleSheet.create({
     height: 16.54,
     tintColor: Colors.light.text,
   },
-  date: {
-    fontSize: 16,
-    fontWeight: "500",
-    textAlign: "center",
-    marginTop: 20,
-    color: Colors.light.text,
-  },
+
   bottomSheet: {
     backgroundColor: Colors.light.backgroundSecondary,
     borderTopLeftRadius: 24,
