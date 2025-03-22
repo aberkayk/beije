@@ -68,9 +68,10 @@ export default function HomeScreen() {
         </Pressable>
       </View>
 
-      {cycleData && <CycleScreen cycleData={cycleData} />}
-
-      <TodaysFeatured insights={insightsData?.data.insights ?? []} />
+      <TodaysFeatured
+        insights={insightsData?.data.insights ?? []}
+        cycleData={cycleData ?? undefined}
+      />
     </View>
   );
 }
@@ -88,6 +89,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 60,
     backgroundColor: Colors.light.backgroundTertiary,
+    zIndex: 20,
   },
   profileButton: {
     width: 32,

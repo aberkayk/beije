@@ -1,11 +1,4 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-  Animated,
-  Pressable,
-} from "react-native";
+import { StyleSheet, Text, View, FlatList, Pressable } from "react-native";
 import React, { useRef, useState, useEffect } from "react";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { Text as UIText } from "@/components/ui/text";
@@ -13,33 +6,52 @@ import { View as UIView } from "@/components/ui/view";
 import Colors from "@/constants/Colors";
 import { InsightCard } from "@/components/insight-card";
 import { NoteCard } from "@/components/note-card";
+import CycleScreen from "@/components/cycle-screen";
+import { CycleData } from "@/types/menstruation";
+import Animated, {
+  useSharedValue,
+  withTiming,
+  useAnimatedStyle,
+  interpolate,
+  Extrapolate,
+  Easing,
+} from "react-native-reanimated";
 
 interface TodaysFeaturedProps {
   insights: any[];
   onSheetIndexChange?: (index: number) => void;
+  cycleData?: CycleData;
 }
 
 const TodaysFeatured: React.FC<TodaysFeaturedProps> = ({
   insights,
   onSheetIndexChange,
+  cycleData,
 }) => {
   const [sheetIndex, setSheetIndex] = useState(0);
-  const noteCardAnimation = useRef(new Animated.Value(0)).current;
+  const noteCardAnimation = useSharedValue(0);
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const position = useSharedValue(0);
 
   useEffect(() => {
     if (sheetIndex === 1) {
-      Animated.timing(noteCardAnimation, {
-        toValue: 1,
+      position.value = withTiming(1, {
         duration: 300,
-        useNativeDriver: true,
-      }).start();
+        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+      });
+      noteCardAnimation.value = withTiming(1, {
+        duration: 300,
+        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+      });
     } else {
-      Animated.timing(noteCardAnimation, {
-        toValue: 0,
+      position.value = withTiming(0, {
         duration: 300,
-        useNativeDriver: true,
-      }).start();
+        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+      });
+      noteCardAnimation.value = withTiming(0, {
+        duration: 300,
+        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+      });
     }
   }, [sheetIndex]);
 
@@ -48,70 +60,77 @@ const TodaysFeatured: React.FC<TodaysFeaturedProps> = ({
     onSheetIndexChange?.(index);
   };
 
-  return (
-    <BottomSheet
-      index={0}
-      snapPoints={["20%", 500]}
-      backgroundStyle={{ backgroundColor: Colors.light.background }}
-      handleIndicatorStyle={styles.bottomSheetIndicator}
-      ref={bottomSheetRef}
-      onChange={handleSheetIndexChange}
-      maxDynamicContentSize={500}
-    >
-      <BottomSheetView
-        style={[
-          styles.insightsContainer,
-          { backgroundColor: Colors.light.background },
-        ]}
-      >
-        <UIText style={styles.insightsTitle}>Bugün Öne Çıkanlar</UIText>
+  const noteCardAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: noteCardAnimation.value,
+      transform: [
+        {
+          translateY: interpolate(
+            noteCardAnimation.value,
+            [0, 1],
+            [20, 0],
+            Extrapolate.CLAMP
+          ),
+        },
+      ],
+    };
+  });
 
-        <FlatList
-          data={insights}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item, index }) => (
-            <InsightCard
-              insight={item}
-              isFirstItem={index === 0}
-              isLastItem={index === (insights?.length ?? 0) - 1}
-            />
-          )}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.flatListContent}
-          ItemSeparatorComponent={() => (
-            <UIView
-              style={{
-                height: 1,
-                backgroundColor: Colors.light.background,
-              }}
-            />
-          )}
-          ListHeaderComponent={
-            sheetIndex === 1 ? (
-              <Animated.View
+  return (
+    <>
+      {cycleData && (
+        <CycleScreen cycleData={cycleData} position={position} />
+      )}
+      <BottomSheet
+        index={0}
+        snapPoints={["20%", 500]}
+        backgroundStyle={{ backgroundColor: Colors.light.background }}
+        handleIndicatorStyle={styles.bottomSheetIndicator}
+        ref={bottomSheetRef}
+        onChange={handleSheetIndexChange}
+        maxDynamicContentSize={500}
+      >
+        <BottomSheetView
+          style={[
+            styles.insightsContainer,
+            { backgroundColor: Colors.light.background },
+          ]}
+        >
+          <UIText style={styles.insightsTitle}>Bugün Öne Çıkanlar</UIText>
+
+          <FlatList
+            data={insights}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item, index }) => (
+              <InsightCard
+                insight={item}
+                isFirstItem={index === 0}
+                isLastItem={index === (insights?.length ?? 0) - 1}
+              />
+            )}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.flatListContent}
+            ItemSeparatorComponent={() => (
+              <UIView
                 style={{
-                  opacity: noteCardAnimation,
-                  transform: [
-                    {
-                      translateY: noteCardAnimation.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [20, 0],
-                      }),
-                    },
-                  ],
+                  height: 1,
+                  backgroundColor: Colors.light.background,
                 }}
-              >
-                <NoteCard />
-              </Animated.View>
-            ) : null
-          }
-        />
-      </BottomSheetView>
-    </BottomSheet>
+              />
+            )}
+            ListHeaderComponent={
+              sheetIndex === 1 ? (
+                <Animated.View style={noteCardAnimatedStyle}>
+                  <NoteCard />
+                </Animated.View>
+              ) : null
+            }
+          />
+        </BottomSheetView>
+      </BottomSheet>
+    </>
   );
 };
-
-export default TodaysFeatured;
 
 const styles = StyleSheet.create({
   bottomSheetIndicator: {
@@ -131,3 +150,5 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
 });
+
+export default TodaysFeatured;
