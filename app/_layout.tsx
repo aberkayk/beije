@@ -46,10 +46,7 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
-  console.log({ appReady, isAnimationFinished });
-
   if (!appReady || !isAnimationFinished) {
-    console.warn("appReady", appReady);
     return (
       <CustomSplashScreen
         onAnimationFinish={() => setIsAnimationFinished(true)}

@@ -16,7 +16,6 @@ export const CustomSplashScreen: React.FC<Props> = ({
   const animationRef = useRef<LottieView>(null);
 
   const handleAnimationFinish = () => {
-    console.log({ repeatCount });
     if (repeatCount < 2) {
       setRepeatCount((prev) => prev + 1);
       // Restart the animation
