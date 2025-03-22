@@ -78,7 +78,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    position: "relative",
     backgroundColor: Colors.light.backgroundTertiary,
   },
   header: {
@@ -88,7 +87,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 60,
     backgroundColor: Colors.light.backgroundTertiary,
-    zIndex: 20,
+    zIndex: 2,
   },
   profileButton: {
     width: 32,

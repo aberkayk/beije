@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { Image, StyleSheet, TouchableOpacity } from "react-native";
 import Svg, { Circle, Path, Text as SvgText, G } from "react-native-svg";
 import { View } from "./ui/view";
 import { Text } from "./ui/text";
@@ -15,6 +15,7 @@ import Animated, {
   withTiming,
   useSharedValue,
 } from "react-native-reanimated";
+import Icons from "@/constants/Icons";
 
 const CIRCLE_RADIUS = 144;
 const DOT_RADIUS = 7.2;
@@ -365,6 +366,21 @@ const CycleScreen: React.FC<CycleScreenProps> = ({
 
   return (
     <Animated.View style={[styles.container, containerAnimatedStyle]}>
+      <Image
+        source={Icons.first}
+        style={styles.first}
+        resizeMode="contain"
+      />
+      <Image
+        source={Icons.third}
+        style={styles.second}
+        resizeMode="contain"
+      />
+      <Image
+        source={Icons.second}
+        style={styles.third}
+        resizeMode="contain"
+      />
       <Text style={styles.date}>
         {displayDate.toLocaleDateString("tr-TR", {
           day: "2-digit",
@@ -415,6 +431,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.backgroundTertiary,
     alignItems: "center",
     paddingTop: 100,
+    position: "relative",
   },
   date: {
     fontSize: 16,
@@ -429,6 +446,25 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     textAlign: "center",
     marginBottom: 25,
+  },
+  first: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    zIndex: 3,
+  },
+  second: {
+    position: "absolute",
+    top: "50%",
+    transform: [{ translateY: "-50%" }],
+    right: -10,
+    zIndex: 0,
+  },
+  third: {
+    position: "absolute",
+    bottom: 200,
+    left: -20,
+    zIndex: 0,
   },
 });
 
