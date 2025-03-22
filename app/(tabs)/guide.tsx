@@ -3,7 +3,7 @@ import React from "react";
 
 const GuideScreen = () => {
   return (
-    <View>
+    <View style={styles.container}>
       <Text>GuideScreen</Text>
     </View>
   );
@@ -11,4 +11,10 @@ const GuideScreen = () => {
 
 export default GuideScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});

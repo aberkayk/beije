@@ -13,8 +13,8 @@ import Animated, {
   withTiming,
   useAnimatedStyle,
   interpolate,
-  Extrapolate,
   Easing,
+  Extrapolation,
 } from "react-native-reanimated";
 
 interface TodaysFeaturedProps {
@@ -92,7 +92,7 @@ const TodaysFeatured: React.FC<TodaysFeaturedProps> = ({
         noteCardVisibility.value,
         [0, 1],
         [0, 1],
-        Extrapolate.CLAMP
+        Extrapolation.CLAMP
       ),
       transform: [
         {
@@ -100,7 +100,7 @@ const TodaysFeatured: React.FC<TodaysFeaturedProps> = ({
             noteCardVisibility.value,
             [0, 1],
             [10, 0],
-            Extrapolate.CLAMP
+            Extrapolation.CLAMP
           ),
         },
         {
@@ -108,7 +108,7 @@ const TodaysFeatured: React.FC<TodaysFeaturedProps> = ({
             noteCardVisibility.value,
             [0, 1],
             [0.95, 1],
-            Extrapolate.CLAMP
+            Extrapolation.CLAMP
           ),
         },
       ],
@@ -116,13 +116,13 @@ const TodaysFeatured: React.FC<TodaysFeaturedProps> = ({
         noteCardVisibility.value,
         [0, 1],
         [0, 91], // 67 (card height) + 24 (vertical margins)
-        Extrapolate.CLAMP
+        Extrapolation.CLAMP
       ),
       marginBottom: interpolate(
         noteCardVisibility.value,
         [0, 1],
         [0, 12],
-        Extrapolate.CLAMP
+        Extrapolation.CLAMP
       ),
       overflow: "hidden",
     };

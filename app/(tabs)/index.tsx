@@ -54,8 +54,6 @@ export default function HomeScreen() {
     } as CycleData;
   }, [menstruationData]);
 
-  console.log({ cycleData: cycleData?.days[1] });
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>

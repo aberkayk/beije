@@ -1,27 +1,41 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { View, StyleSheet, Dimensions, Image } from "react-native";
 import LottieView from "lottie-react-native";
 import Colors from "@/constants/Colors";
 
 const { width, height } = Dimensions.get("window");
 
-export const CustomSplashScreen: React.FC = () => {
+interface Props {
+  onAnimationFinish?: () => void;
+}
+
+export const CustomSplashScreen: React.FC<Props> = ({
+  onAnimationFinish,
+}: Props) => {
   const [repeatCount, setRepeatCount] = useState(0);
+  const animationRef = useRef<LottieView>(null);
 
   const handleAnimationFinish = () => {
+    console.log({ repeatCount });
     if (repeatCount < 2) {
       setRepeatCount((prev) => prev + 1);
+      // Restart the animation
+      animationRef.current?.reset();
+      animationRef.current?.play();
+    } else {
+      onAnimationFinish?.();
     }
   };
 
   return (
     <View style={styles.container}>
       <LottieView
+        ref={animationRef}
         source={require("../assets/animation_splash.json")}
         autoPlay
-        loop={repeatCount < 2}
-        onAnimationFinish={handleAnimationFinish}
+        loop={false}
         style={styles.animation}
+        onAnimationFinish={handleAnimationFinish}
       />
       <View style={styles.logoContainer}>
         <Image source={require("../assets/images/logo.png")} />

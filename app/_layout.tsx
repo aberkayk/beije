@@ -25,41 +25,43 @@ export const unstable_settings = {
 
 // Keep the splash screen visible while we fetch resources
 // SplashScreen.preventAutoHideAsync();
-// SplashScreen.hideAsync();
 
 export default function RootLayout() {
-  // const [loaded, error] = useFonts({
-  //   SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-  //   ...FontAwesome.font,
-  // });
+  const [appReady, setAppReady] = useState(false);
+  const [isAnimationFinished, setIsAnimationFinished] = useState(false);
 
-  // useEffect(() => {
-  //   if (error) throw error;
-  // }, [error]);
+  const [loaded, error] = useFonts({
+    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    ...FontAwesome.font,
+  });
 
-  // useEffect(() => {
-  //   if (loaded) {
-  //     SplashScreen.hideAsync();
-  //   }
-  // }, [loaded]);
+  useEffect(() => {
+    if (error) throw error;
+  }, [error]);
 
-  // if (!loaded) {
-  //   return null;
-  // }
+  useEffect(() => {
+    if (loaded) {
+      // SplashScreen.hideAsync();
+      setAppReady(true);
+    }
+  }, [loaded]);
+
+  console.log({ appReady, isAnimationFinished });
+
+  if (!appReady || !isAnimationFinished) {
+    console.warn("appReady", appReady);
+    return (
+      <CustomSplashScreen
+        onAnimationFinish={() => setIsAnimationFinished(true)}
+      />
+    );
+  }
 
   return <RootLayoutNav />;
 }
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 0);
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
     <Provider store={store}>
@@ -69,16 +71,12 @@ function RootLayoutNav() {
         >
           <AuthProvider>
             <GestureHandlerRootView style={{ flex: 1 }}>
-              {loading ? (
-                <CustomSplashScreen />
-              ) : (
-                <Stack>
-                  <Stack.Screen
-                    name="(tabs)"
-                    options={{ headerShown: false }}
-                  />
-                </Stack>
-              )}
+              <Stack>
+                <Stack.Screen
+                  name="(tabs)"
+                  options={{ headerShown: false }}
+                />
+              </Stack>
             </GestureHandlerRootView>
           </AuthProvider>
         </ThemeProvider>

@@ -3,12 +3,9 @@ import { View } from "@/components/ui/view";
 import { StyleSheet } from "react-native";
 
 export default function CalendarScreen() {
-  console.log("calendar");
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
-      <View style={styles.separator} />
+      <Text style={styles.title}>Calendar</Text>
     </View>
   );
 }
