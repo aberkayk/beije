@@ -3,7 +3,11 @@ import { StyleSheet, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import Colors from "@/constants/Colors";
 
-export const NoteCard = () => {
+interface NoteCardProps {
+  note?: string;
+}
+
+export const NoteCard: React.FC<NoteCardProps> = ({ note }) => {
   return (
     <View style={[styles.container]}>
       <View style={styles.contentContainer}>
@@ -13,7 +17,7 @@ export const NoteCard = () => {
           numberOfLines={2}
           ellipsizeMode="tail"
         >
-          Şekerli yiyeceklerden kaçınmmak, şişkinliği azaltabilir.
+          {note || "Seçilen gün için not bulunmamaktadır."}
         </Text>
       </View>
     </View>

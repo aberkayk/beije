@@ -28,6 +28,7 @@ const EXPANDED_DOT_RADIUS = 12;
 interface CycleScreenProps {
   cycleData: CycleData;
   position?: Animated.SharedValue<number>;
+  onDaySelected?: (dayData: any) => void;
 }
 
 const getArcPath = (radius: number, strokeWidth: number) => {
@@ -58,6 +59,7 @@ const ChevronDown = () => (
 const CycleScreen: React.FC<CycleScreenProps> = ({
   cycleData,
   position,
+  onDaySelected,
 }) => {
   const [selectedDayIndex, setSelectedDayIndex] = useState<number | null>(
     cycleData.currentDay - 1
@@ -85,6 +87,23 @@ const CycleScreen: React.FC<CycleScreenProps> = ({
   const handleDayPress = (index: number) => {
     if (isBottomSheetExpanded) {
       setSelectedDayIndex(index);
+
+      // Find selected day data
+      const targetDate = new Date(cycleStartDate);
+      targetDate.setDate(targetDate.getDate() + index);
+      targetDate.setHours(0, 0, 0, 0);
+
+      const selectedDay = cycleData.days.find((d) => {
+        const dayDate = new Date(d.date);
+        dayDate.setHours(0, 0, 0, 0);
+        return dayDate.getTime() === targetDate.getTime();
+      });
+
+      // Notify parent component of the selected day
+      if (selectedDay && onDaySelected) {
+        onDaySelected(selectedDay);
+      }
+
       // Animate dot growth when pressed
       dotAnimationProgress.value = withTiming(0, { duration: 50 }, () => {
         dotAnimationProgress.value = withTiming(1, { duration: 300 });

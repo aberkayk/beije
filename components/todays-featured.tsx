@@ -29,7 +29,9 @@ const TodaysFeatured: React.FC<TodaysFeaturedProps> = ({
   cycleData,
 }) => {
   const [sheetIndex, setSheetIndex] = useState(0);
+  const [selectedDay, setSelectedDay] = useState<any>(null);
   const noteCardAnimation = useSharedValue(0);
+  const noteCardVisibility = useSharedValue(0);
   const bottomSheetRef = useRef<BottomSheet>(null);
   const position = useSharedValue(0);
 
@@ -52,34 +54,88 @@ const TodaysFeatured: React.FC<TodaysFeaturedProps> = ({
         duration: 300,
         easing: Easing.bezier(0.25, 0.1, 0.25, 1),
       });
+      // Reset selected day when sheet is closed
+      setSelectedDay(null);
     }
   }, [sheetIndex]);
+
+  // Animate note card visibility when selected day changes or sheet index changes
+  useEffect(() => {
+    const hasNote = selectedDay && selectedDay.note;
+    const isExpanded = sheetIndex === 1;
+
+    if (isExpanded && hasNote) {
+      noteCardVisibility.value = withTiming(1, {
+        duration: 300,
+        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+      });
+    } else {
+      noteCardVisibility.value = withTiming(0, {
+        duration: 200,
+        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+      });
+    }
+  }, [selectedDay, sheetIndex]);
 
   const handleSheetIndexChange = (index: number) => {
     setSheetIndex(index);
     onSheetIndexChange?.(index);
   };
 
+  const handleDaySelected = (dayData: any) => {
+    setSelectedDay(dayData);
+  };
+
   const noteCardAnimatedStyle = useAnimatedStyle(() => {
     return {
-      opacity: noteCardAnimation.value,
+      opacity: interpolate(
+        noteCardVisibility.value,
+        [0, 1],
+        [0, 1],
+        Extrapolate.CLAMP
+      ),
       transform: [
         {
           translateY: interpolate(
-            noteCardAnimation.value,
+            noteCardVisibility.value,
             [0, 1],
-            [20, 0],
+            [10, 0],
+            Extrapolate.CLAMP
+          ),
+        },
+        {
+          scale: interpolate(
+            noteCardVisibility.value,
+            [0, 1],
+            [0.95, 1],
             Extrapolate.CLAMP
           ),
         },
       ],
+      height: interpolate(
+        noteCardVisibility.value,
+        [0, 1],
+        [0, 91], // 67 (card height) + 24 (vertical margins)
+        Extrapolate.CLAMP
+      ),
+      marginBottom: interpolate(
+        noteCardVisibility.value,
+        [0, 1],
+        [0, 12],
+        Extrapolate.CLAMP
+      ),
+      overflow: "hidden",
     };
   });
 
   return (
     <>
       {cycleData && (
-        <CycleScreen cycleData={cycleData} position={position} />
+        <CycleScreen
+          cycleData={cycleData}
+          position={position}
+          onDaySelected={handleDaySelected}
+        />
       )}
       <BottomSheet
         index={0}
@@ -119,11 +175,9 @@ const TodaysFeatured: React.FC<TodaysFeaturedProps> = ({
               />
             )}
             ListHeaderComponent={
-              sheetIndex === 1 ? (
-                <Animated.View style={noteCardAnimatedStyle}>
-                  <NoteCard />
-                </Animated.View>
-              ) : null
+              <Animated.View style={noteCardAnimatedStyle}>
+                <NoteCard note={selectedDay?.note} />
+              </Animated.View>
             }
           />
         </BottomSheetView>

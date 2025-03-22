@@ -11,7 +11,6 @@ import Icons from "@/constants/Icons";
 import React from "react";
 import TodaysFeatured from "@/components/todays-featured";
 import { CycleData } from "@/types/menstruation";
-import CycleScreen from "@/components/cycle-screen";
 
 export default function HomeScreen() {
   const profile = useSelector(selectProfile);
@@ -54,6 +53,8 @@ export default function HomeScreen() {
       days: sortedDays,
     } as CycleData;
   }, [menstruationData]);
+
+  console.log({ cycleData: cycleData?.days[1] });
 
   return (
     <View style={styles.container}>
