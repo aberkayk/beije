@@ -20,7 +20,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#FDECE7"
-      }
+      },
+      "package": "com.abkocak.beijemobile"
     },
     "web": {
       "bundler": "metro",
@@ -30,6 +31,15 @@
     "plugins": ["expo-router"],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "467a5429-9a6f-43cc-a780-b6ccf34b426d"
+      }
+    },
+    "owner": "abkocak"
   }
 }

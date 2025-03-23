@@ -1,4 +1,4 @@
-import { persistor, store } from "@/redux/store";
+import { store } from "@/redux/store";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
   DefaultTheme,
@@ -12,7 +12,6 @@ import { useEffect, useState } from "react";
 import { useColorScheme } from "react-native";
 import "react-native-reanimated";
 import { Provider } from "react-redux";
-import { PersistGate } from "redux-persist/integration/react";
 import AuthProvider from "@/redux/providers/auth-provider";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { CustomSplashScreen } from "@/components/custom-splash-screen";
@@ -62,22 +61,20 @@ function RootLayoutNav() {
 
   return (
     <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <ThemeProvider
-          value={colorScheme === "dark" ? DefaultTheme : DefaultTheme}
-        >
-          <AuthProvider>
-            <GestureHandlerRootView style={{ flex: 1 }}>
-              <Stack>
-                <Stack.Screen
-                  name="(tabs)"
-                  options={{ headerShown: false }}
-                />
-              </Stack>
-            </GestureHandlerRootView>
-          </AuthProvider>
-        </ThemeProvider>
-      </PersistGate>
+      <ThemeProvider
+        value={colorScheme === "dark" ? DefaultTheme : DefaultTheme}
+      >
+        <AuthProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <Stack>
+              <Stack.Screen
+                name="(tabs)"
+                options={{ headerShown: false }}
+              />
+            </Stack>
+          </GestureHandlerRootView>
+        </AuthProvider>
+      </ThemeProvider>
     </Provider>
   );
 }
